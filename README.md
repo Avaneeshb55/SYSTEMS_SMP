@@ -135,7 +135,7 @@ The screenshot above shows the `ss -tunp` output when running **without sudo**. 
 - The **Process column is blank** for system-owned connections 
 - **User-owned processes** like Firefox remain visible
 
-**NOTE : In the given script file if the user runs the script file then an error message will be shown , the above screenshot was obtained by removing the 'if' condition block** 
+**NOTE : In the given script file if the user runs the script file without root privilages i.e., without sudo , then an error message will be shown , the above screenshot was obtained by removing the 'if' condition block** 
 
 ---
 
@@ -156,7 +156,7 @@ These are **queue counters** showing how many bytes are stuck waiting in the net
 
 ## Script Contents
 
-[SCRIPT](Screenshots/Script.png)
+![SCRIPT](Screenshots/Script.png)
 
 ---
 
@@ -177,7 +177,7 @@ Therefore if the user runs the script file without sudo then an error will be di
 
 ### A screenshot showing the execution of the script file without root privileges :
 
-[ERROR](Screenshots/Error.png)
+![ERROR](Screenshots/Error.png)
 
 ---
 
