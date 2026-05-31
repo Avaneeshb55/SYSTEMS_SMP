@@ -1,0 +1,18 @@
+a)  What is system call? Explain in a sentence.
+Ans: System call is the programmatic interface thta allows a user-space application to request privilages operations (such as reading a file, haradware access etc ) from the operating system kernel
+
+b)Name a few syscalls and what they do .
+Ans: 1.openat : Opens a file or directory relative to a directory file discriptor , returning a handle used to read or write .
+     2.read   : Reads a specified number of bytes of data fron an open file discriptor into a memory buffer .
+     3.write  : Write memory data from a memory buffer uot to an open file discriptor (like a file, terminal output, socket  ).
+     4.close  : Closes an active file discriptor so that it no longer refers to any file and can be reused by the system .
+     5.mmap   : Maps files or devices into the process' virtual memory spaec , allowing memory-mapped file input and output or allocating raw memory blocks.
+     6.fork   : Creates a new, duplicate child process by duplicating the calling parent process.
+     7.execve : Creates a new program by replacing the current process image, initialised stack , and heap with new a executable program.
+     8.getpid : Returns the process ID of the calling process  .
+     (getppid : Returns the process ID of the calling parent process ).
+     9.mkdir  : Creates a new directory .
+     (rmdir   : Deletes the specified directory ).
+    10.kill   : Sends a signal to a process or a process group .
+    11.socket : Creates a communication endpoint (like TCP/UDP) and returns a file discriptor .
+    12.getcwd : It returns the working directory of the currnent process .(pwd uses this to get the current working directory ).
