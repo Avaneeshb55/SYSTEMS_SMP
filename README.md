@@ -31,13 +31,13 @@ Here is the screenshot of the program output which displays the `PASSWORD`, `HAS
 | 3 | SHA-256 with random salt 2 prepended |  Yes |
 
 ### Step 1 : Plain SHA-256
-```
-hash = SHA256("IETNITK")
+```python
+plain_hash=hashlib.sha256(PASSWORD.encode()).hexdigest()
 ```
 The same password always produces the exact same hash every single run.
 
 ### Step 2 : SHA-256 with Salt #1
-```
+```python
 salt1=os.urandom(16)                         # 16 cryptographically random bytes
 salted_input1= salt1 + PASSWORD.encode()
 salted_hash1 = hashlib.sha256(salted_input1).hexdigest()
@@ -45,7 +45,7 @@ salted_hash1 = hashlib.sha256(salted_input1).hexdigest()
 A fresh random salt is generated and prepended before hashing.
 
 ### Step 3 : SHA-256 with Salt #2
-```
+```python
 salt2=os.urandom(16)                         # 16 cryptographically random bytes
 salted_input2= salt2 + PASSWORD.encode()
 salted_hash2 = hashlib.sha256(salted_input2).hexdigest()
