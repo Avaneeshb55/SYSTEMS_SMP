@@ -1,0 +1,86 @@
+#!/usr/bin/env bpftrace
+/*
+ * kconnectcore.bt
+
+ * TCP: emits only once tcp_set_state confirms the socket reached TCP_ESTABLISHED (state 1). failed/refused/still pending ie.,
+   connect() attempts are filtered out, so every TCP line here represents a connection that actually succeeded.
+ 
+ * UDP: emits on every udp_sendmsg / udpv6_sendmsg as UDP has no handshake.
+
+ * PID targeting: pass a PID as the first bpftrace arg to trace only that process. Omit it to trace everything $1 defaults to 0 when
+   not supplied, and 0 (the kernel idle task) is never a real connecting process, so 0 safely doubles as no filter.
+
+ * NOTE: parent-process visibility is not present.
+   It can't be shown through this pipe without adding a field to kconnectcore.c's struct/parser which I am avoiding.
+
+ */
+
+BEGIN
+{
+    printf("#KConnect trace attached, waiting for socket activity...\n");
+}
+
+/* ---------- TCP: established only (v4 + v6 in one probe) ---------- */
+
+kprobe:tcp_set_state
+/((int32)arg1 == 1) && ($1 == 0 || pid == $1)/
+{
+    $sk = (struct sock *)arg0;
+    $family = $sk->__sk_common.skc_family;
+
+    // AF_INET = 2 
+    if ($family == 2) {
+        $daddr_raw  = $sk->__sk_common.skc_daddr;
+        $daddr_host = bswap($daddr_raw);
+
+        // skip 127.0.0.0/8 loopback noise
+        if (($daddr_host >> 24) != 127) {
+            $daddr = ntop($daddr_raw);
+            $dport = bswap($sk->__sk_common.skc_dport);
+            $sport = $sk->__sk_common.skc_num;
+            printf("%d|%s|TCP|%s|%d|%d\n", pid, comm, $daddr, $dport, $sport);
+        }
+    }
+
+    // AF_INET6 = 10
+    if ($family == 10) {
+        $daddr6 = $sk->__sk_common.skc_v6_daddr.in6_u.u6_addr8;
+        $daddr  = ntop($daddr6);
+        $dport  = bswap($sk->__sk_common.skc_dport);
+        $sport  = $sk->__sk_common.skc_num;
+        printf("%d|%s|TCP|%s|%d|%d\n", pid, comm, $daddr, $dport, $sport);
+    }
+}
+
+/* ---------- UDP IPv4 send ---------- */
+
+kprobe:udp_sendmsg
+/$1 == 0 || pid == $1/
+{
+    $sk = (struct sock *)arg0;
+    $daddr_raw = $sk->__sk_common.skc_daddr;
+
+    if ($daddr_raw != 0) {
+        $daddr_host = bswap($daddr_raw);
+
+        if (($daddr_host >> 24) != 127) {
+            $daddr = ntop($daddr_raw);
+            $dport = bswap($sk->__sk_common.skc_dport);
+            $sport = $sk->__sk_common.skc_num;
+            printf("%d|%s|UDP|%s|%d|%d\n", pid, comm, $daddr, $dport, $sport);
+        }
+    }
+}
+
+/* ---------- UDP IPv6 send ---------- */
+
+kprobe:udpv6_sendmsg
+/$1 == 0 || pid == $1/
+{
+    $sk = (struct sock *)arg0;
+    $daddr6 = $sk->__sk_common.skc_v6_daddr.in6_u.u6_addr8;
+    $daddr  = ntop($daddr6);
+    $dport  = bswap($sk->__sk_common.skc_dport);
+    $sport  = $sk->__sk_common.skc_num;
+    printf("%d|%s|UDP|%s|%d|%d\n", pid, comm, $daddr, $dport, $sport);
+}
