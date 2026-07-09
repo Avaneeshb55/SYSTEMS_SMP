@@ -1,3 +1,10 @@
+## Author Information 
+
+| Name | Roll Number | Branch |
+| :--- | :--- | :--- |
+| AVANEESH B | 251CS215 | Computer Science |
+---
+## Preview
 # KConnect Core
 
 A live network-connection monitor built with **bpftrace** (kernel-side tracing) and a **C display program** (userspace rendering). `kconnectcore.bt` traces TCP and UDP socket activity in the kernel and streams it to `kconnectcore.c`, which renders a live terminal dashboard.
